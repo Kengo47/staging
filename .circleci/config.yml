@@ -37,6 +37,9 @@ jobs:
 
 
       # Databse setup
+      - run:
+          name: 'wait for db'
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
       # database.ymlとdatabase.yml.ciを入れ替える
       - run: mv config/database.yml.ci config/database.yml
       - run: bundle exec rails db:create
