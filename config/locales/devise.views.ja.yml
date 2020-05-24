@@ -8,7 +8,7 @@ ja:
         avatar: "プロフィール写真"
         password: "パスワード"
         password_confirmation: "確認用パスワード"
-        remember_me: "ログインを記憶"
+        remember_me: "ログイン状態を保存"
     models:
       user: "ユーザー"
   devise:
