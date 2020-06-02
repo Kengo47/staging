@@ -13,11 +13,12 @@
 //= require rails-ujs
 //= require activestorage
 //= require turbolinks
-//= require_tree .
 //= require jquery
 //= require jquery_ujs
 //= require popper
 //= require bootstrap
+//= require infinite-scroll.pkgd.min
+//= require_tree .
 
 // Prefectureセレクトボックスに連動してCityセレクトボックスを変更する
 $(document).on('change', '#post_prefecture_id', function() {
@@ -30,4 +31,48 @@ $(document).on('change', '#post_prefecture_id', function() {
   }).done(function(data) {
     return $('#cities_select').html(data);
   });
+});
+
+$(document).on('change', '#search_prefecture_id', function() {
+  return $.ajax({
+    type: 'GET',
+    url: '/posts/cities_select',
+    data: {
+      prefecture_id: $(this).val()
+    }
+  }).done(function(data) {
+    return $('#cities_select').html(data);
+  });
+});
+
+// 無限スクロール(post)
+$(document).on('turbolinks:load', function() {
+  $('.post-cards').infiniteScroll({
+    path: 'nav ul.pagination a[rel=next]',
+    append: '.post-cards .post-card',
+    history: false,
+    status: '.page-load-status',
+    hideNav: 'nav ul.pagination',
+    button: '.view-more-button',
+    scrollThreshold: false
+  });
+});
+
+// 無限スクロール(user)
+$(document).on('turbolinks:load', function() {
+  $('.user-cards').infiniteScroll({
+    path: 'nav ul.pagination a[rel=next]',
+    append: '.user-cards .user-card',
+    history: false,
+    status: '.page-load-status',
+    hideNav: 'nav ul.pagination',
+    button: '.view-more-button',
+    scrollThreshold: false
+  });
+});
+
+$(document).on('turbolinks:load', function() {
+  if(!$("nav ul.pagination")[0]) {
+    $('.view-more-button').hide();
+  }
 });

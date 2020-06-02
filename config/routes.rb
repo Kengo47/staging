@@ -17,10 +17,12 @@ Rails.application.routes.draw do
     get 'signup', to: 'users/registrations#new'
   end
 
-  resources :users, only: [:show]
+  resources :users, only: [:index, :show, :destroy]
   resources :posts, only: [:new, :show, :create, :edit, :update, :destroy] do
     collection do
       get :cities_select
+      get :search
+      get :rank
     end
     resources :comments, only: [:create, :destroy]
     resource :likes, only: [:create, :destroy]

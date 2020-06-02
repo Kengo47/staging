@@ -16,11 +16,10 @@ class PostsController < ApplicationController
     @post = current_user.posts.build(post_params)
     if @post.save
       flash[:notice] = "投稿しました！"
-      redirect_to root_url
+      redirect_to @post
     else
-      redirect_to new_post_path, flash: {
-        error_messages: @post.errors.full_messages
-      }
+      flash.now[:error_messages] = @post.errors.full_messages
+      render 'new'
     end
   end
 
@@ -31,7 +30,7 @@ class PostsController < ApplicationController
   def update
     if @post.update_attributes(post_params)
       flash[:notice] = "更新しました！"
-      redirect_to root_url
+      redirect_to @post
     else
       redirect_back fallback_location: @post, flash: {
         error_messages: @post.errors.full_messages
@@ -51,13 +50,26 @@ class PostsController < ApplicationController
     end
   end
 
+  def search
+    @search_params = post_search_params
+    @posts = Post.search(@search_params).page(params[:page]).per(6).includes(:user, :prefecture, :city)
+  end
+
+  def rank
+    @rank_posts = Post.unscoped.joins(:likes).group(:post_id).order('count(post_id) desc').page(params[:page]).per(6).includes(:user, :prefecture, :city)
+  end
+
   private
 
     def post_params
-      params.require(:post).permit(:title, :body, :picture, :picture_cache, :prefecture_id, :city_id)
+      params.require(:post).permit(:name, :body, :picture, :picture_cache, :prefecture_id, :city_id)
     end
 
     def set_target_post
       @post = Post.find(params[:id])
+    end
+
+    def post_search_params
+      params.fetch(:search, {}).permit(:name, :prefecture_id, :city_id)
     end
 end
