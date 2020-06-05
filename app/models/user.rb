@@ -38,7 +38,7 @@ class User < ApplicationRecord
   has_many :following, through: :active_relationships, source: :followed
   has_many :followers, through: :passive_relationships, source: :follower
   mount_uploader :avatar, AvatarUploader
-  validates :name, presence: true, length: { maximum: 10 }
+  validates :name, presence: true, uniqueness: true, length: { maximum: 10 }
 
   devise :database_authenticatable, :registerable,
           :recoverable, :rememberable, :validatable, :confirmable
@@ -61,6 +61,10 @@ class User < ApplicationRecord
   # いいねしているかどうかの判定
   def already_liked?(post)
     self.likes.exists?(post_id: post.id)
+  end
+
+  def like(post)
+    likes.find_or_create_by(post_id: post.id)
   end
 
   # 検索機能のスコープ
